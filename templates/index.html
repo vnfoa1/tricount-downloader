@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tricount Downloader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .options-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .checkbox-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 400;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-preview {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-preview:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .preview-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .preview-box.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .preview-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preview-label {
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .preview-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+        
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border-left: 4px solid #3c3;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Tricount Downloader</h1>
+        <p class="subtitle">Téléchargez vos données Tricount facilement</p>
+        
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+        
+        <div class="form-group">
+            <label for="tricountKey">Clé Tricount *</label>
+            <input 
+                type="text" 
+                id="tricountKey" 
+                placeholder="Ex: tISWyMCgrIMgFuxudZ"
+                autocomplete="off"
+            >
+            <div class="hint">
+                Copiez la partie après https://tricount.com/ de votre lien partagé
+            </div>
+        </div>
+        
+        <div class="preview-box" id="previewBox">
+            <div class="preview-title">📋 Aperçu du Tricount</div>
+            <div class="preview-item">
+                <span class="preview-label">Titre:</span>
+                <span class="preview-value" id="previewTitle">-</span>
+            </div>
+            <div class="preview-item">
+                <span class="preview-label">Participants:</span>
+                <span class="preview-value" id="previewParticipants">-</span>
+            </div>
+            <div class="preview-item">
+                <span class="preview-label">Transactions:</span>
+                <span class="preview-value" id="previewTransactions">-</span>
+            </div>
+            <div class="preview-item">
+                <span class="preview-label">Montant total:</span>
+                <span class="preview-value" id="previewAmount">-</span>
+            </div>
+        </div>
+        
+        <div class="options">
+            <div class="options-title">⚙️ Options d'export</div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="exportCsv" checked>
+                <label for="exportCsv">Exporter en CSV</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="exportExcel" checked>
+                <label for="exportExcel">Exporter en Excel (XLSX)</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="exportSesterce">
+                <label for="exportSesterce">Exporter pour Sesterce</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="downloadAttachments">
+                <label for="downloadAttachments">Télécharger les pièces jointes</label>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Traitement en cours...</div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-preview" onclick="previewTricount()">
+                👁️ Aperçu
+            </button>
+            <button class="btn-download" onclick="downloadTricount()">
+                ⬇️ Télécharger
+            </button>
+        </div>
+        
+        <div class="footer">
+            Créé avec ❤️ | <a href="https://github.com/MrNachoX/tricount-downloader" target="_blank">GitHub</a>
+        </div>
+    </div>
+    
+    <script>
+        function showAlert(message, type) {
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            
+            errorAlert.classList.remove('show');
+            successAlert.classList.remove('show');
+            
+            if (type === 'error') {
+                errorAlert.textContent = message;
+                errorAlert.classList.add('show');
+            } else {
+                successAlert.textContent = message;
+                successAlert.classList.add('show');
+            }
+            
+            setTimeout(() => {
+                errorAlert.classList.remove('show');
+                successAlert.classList.remove('show');
+            }, 5000);
+        }
+        
+        function setLoading(isLoading) {
+            const loading = document.getElementById('loading');
+            const buttons = document.querySelectorAll('button');
+            
+            if (isLoading) {
+                loading.classList.add('show');
+                buttons.forEach(btn => btn.disabled = true);
+            } else {
+                loading.classList.remove('show');
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+        
+        async function previewTricount() {
+            const tricountKey = document.getElementById('tricountKey').value.trim();
+            
+            if (!tricountKey) {
+                showAlert('Veuillez entrer une clé Tricount', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                const response = await fetch('/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tricount_key: tricountKey })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de la récupération des données');
+                }
+                
+                document.getElementById('previewTitle').textContent = data.title;
+                document.getElementById('previewParticipants').textContent = data.participants;
+                document.getElementById('previewTransactions').textContent = data.transactions;
+                document.getElementById('previewAmount').textContent = 
+                    data.total_amount.toFixed(2) + ' ' + data.currency;
+                
+                document.getElementById('previewBox').classList.add('show');
+                showAlert('Aperçu chargé avec succès !', 'success');
+                
+            } catch (error) {
+                showAlert(error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function downloadTricount() {
+            const tricountKey = document.getElementById('tricountKey').value.trim();
+            
+            if (!tricountKey) {
+                showAlert('Veuillez entrer une clé Tricount', 'error');
+                return;
+            }
+            
+            const options = {
+                tricount_key: tricountKey,
+                download_attachments: document.getElementById('downloadAttachments').checked,
+                export_csv: document.getElementById('exportCsv').checked,
+                export_excel: document.getElementById('exportExcel').checked,
+                export_sesterce: document.getElementById('exportSesterce').checked
+            };
+            
+            if (!options.export_csv && !options.export_excel && !options.export_sesterce) {
+                showAlert('Veuillez sélectionner au moins un format d\'export', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(options)
+                });
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Erreur lors du téléchargement');
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'tricount_export.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showAlert('Téléchargement réussi !', 'success');
+                
+            } catch (error) {
+                showAlert(error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        // Permettre l'envoi avec Entrée
+        document.getElementById('tricountKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                previewTricount();
+            }
+        });
+    </script>
+</body>
+</html>
