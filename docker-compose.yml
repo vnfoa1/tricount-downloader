@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  tricount-downloader:
+    build: .
+    container_name: tricount-downloader
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./downloads:/app/downloads
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
